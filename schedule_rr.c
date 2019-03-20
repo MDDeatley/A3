@@ -30,10 +30,14 @@ void schedule(){
     int *ta = malloc (n * sizeof *ta);//holds turn around times for tasks
     int *wt = malloc (n * sizeof *wt);//holds waiting times for tasks
     int *bt = malloc (n * sizeof *bt);//holds burst times for tasks
+    
+    int *WT = malloc (n * sizeof *WT);//holds burst times for tasks
+    
     //set waiting times & turn around times to 0
     for(int i = 0; i < n; i++){
         *(ta + i) = 0;
         *(wt + i) = 0;
+        *(WT + i) = 0;
     }
     
     struct node *Temp = H;
@@ -45,7 +49,8 @@ void schedule(){
     //while queue is not empty
     while(H != NULL){       
         
-        *(wt + (H->task->tid)) += time - ( *(bt + (H->task->tid)) - H->task->burst); //wt = arival time - burst done
+        *(wt + (H->task->tid)) += time - (*(WT + (H->task->tid)));
+        *(WT + (H->task->tid)) = time +10;
         
         //tick clock and do task
         for(int i = 0; i < 10; i++){

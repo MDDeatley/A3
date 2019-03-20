@@ -37,10 +37,14 @@ void schedule(){
     int *ta = malloc (n * sizeof *ta);//holds turn around times for tasks
     int *wt = malloc (n * sizeof *wt);//holds waiting times for tasks
     int *bt = malloc (n * sizeof *bt);//holds burst times for tasks
+    
+    int *WT = malloc (n * sizeof *WT);//used in wait time calculation
+    
     //set waiting times & turn around times to 0
     for(int i = 0; i < n; i++){
         *(ta + i) = 0;
         *(wt + i) = 0;
+        *(WT + i) = 0;
     }
     
     //for each priority level
@@ -51,8 +55,11 @@ void schedule(){
             Temp = Temp->next;
         }
         //while queue is not empty
-        while(H[i] != NULL){   
-            *(wt + (H[i]->task->tid)) += time - ( *(bt + (H[i]->task->tid)) - H[i]->task->burst); //wt = arival time - burst done
+        while(H[i] != NULL){  
+            //wait time calculation
+            *(wt + (H[i]->task->tid)) += time - (*(WT + (H[i]->task->tid)));
+            *(WT + (H[i]->task->tid)) = time +10;
+            
             //tick clock and do task
             for(int j = 0; j < 10; j++){
                 time++;//increment clock
