@@ -31,20 +31,16 @@ void add(char *name, int priority, int burst){
     }
 }
 
-// invoke the scheduler
 void schedule(){
     int time = 0;//clock
     int *ta = malloc (n * sizeof *ta);//holds turn around times for tasks
     int *wt = malloc (n * sizeof *wt);//holds waiting times for tasks
     int *bt = malloc (n * sizeof *bt);//holds burst times for tasks
     
-    int *WT = malloc (n * sizeof *WT);//used in wait time calculation
-    
     //set waiting times & turn around times to 0
     for(int i = 0; i < n; i++){
         *(ta + i) = 0;
         *(wt + i) = 0;
-        *(WT + i) = 0;
     }
     
     //for each priority level
@@ -55,11 +51,7 @@ void schedule(){
             Temp = Temp->next;
         }
         //while queue is not empty
-        while(H[i] != NULL){  
-            //wait time calculation
-            *(wt + (H[i]->task->tid)) += time - (*(WT + (H[i]->task->tid)));
-            *(WT + (H[i]->task->tid)) = time +10;
-            
+        while(H[i] != NULL){              
             //tick clock and do task
             for(int j = 0; j < 10; j++){
                 time++;//increment clock
@@ -70,7 +62,8 @@ void schedule(){
             }
             //if time remaining is 0 remove from job queue
             if(H[i]->task->burst == 0){
-                *(ta + (H[i]->task->tid)) += time; //set turnaround time
+                *(ta + (H[i]->task->tid)) += time;//set turnaround time
+                *(wt + (H[i]->task->tid)) += time - *(bt + (H[i]->task->tid));//set wait time
                 insertEnd(&Done, H[i]->task);
                 delete(&H[i], H[i]->task);
             //else move to end of job queue

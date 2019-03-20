@@ -24,20 +24,16 @@ void add(char *name, int priority, int burst){
     insertEnd(&H, in);
 }
 
-// invoke the scheduler
 void schedule(){
     int time = 0;//clock
     int *ta = malloc (n * sizeof *ta);//holds turn around times for tasks
     int *wt = malloc (n * sizeof *wt);//holds waiting times for tasks
     int *bt = malloc (n * sizeof *bt);//holds burst times for tasks
     
-    int *WT = malloc (n * sizeof *WT);//holds burst times for tasks
-    
     //set waiting times & turn around times to 0
     for(int i = 0; i < n; i++){
         *(ta + i) = 0;
         *(wt + i) = 0;
-        *(WT + i) = 0;
     }
     
     struct node *Temp = H;
@@ -48,10 +44,6 @@ void schedule(){
     
     //while queue is not empty
     while(H != NULL){       
-        
-        *(wt + (H->task->tid)) += time - (*(WT + (H->task->tid)));
-        *(WT + (H->task->tid)) = time +10;
-        
         //tick clock and do task
         for(int i = 0; i < 10; i++){
             time++;//increment clock
@@ -62,7 +54,8 @@ void schedule(){
         }
         //if time remaining is 0 remove from job queue
         if(H->task->burst == 0){
-            *(ta + (H->task->tid)) += time; //set turnaround time
+            *(ta + (H->task->tid)) += time;//set turnaround time
+            *(wt + (H->task->tid)) += time - *(bt + (H->task->tid));//set wait time
             insertEnd(&Done, H->task);
             delete(&H, H->task);
         //else move to end of job queue
@@ -91,8 +84,6 @@ void schedule(){
     printf("\nAverage Waiting Time = %.2f\n",avwt);
     printf("Average Turnaround Time = %.2f\n",avta);
 }
-
-//Inserts Task at End of list
 
 void insertEnd(struct node **head, Task *newTask) {
     struct node *newNode = malloc(sizeof(struct node));
